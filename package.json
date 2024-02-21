@@ -1,0 +1,70 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "cross-env REACT_APP_ENV=dev umi build",
+    "build:pro": "cross-env REACT_APP_ENV=pro umi build",
+    "build:test": "cross-env REACT_APP_ENV=test umi build",
+    "dev": "umi dev",
+    "postinstall": "umi setup",
+    "lint-staged": "lint-staged",
+    "setup": "umi setup",
+    "start": "cross-env REACT_APP_ENV=dev npm run dev",
+    "start:pro": "cross-env REACT_APP_ENV=pro npm run dev",
+    "start:test": "cross-env REACT_APP_ENV=test npm run dev"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css,less}": [
+      "umi lint"
+    ]
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.3.0",
+    "@ant-design/plots": "^1.2.5",
+    "@antv/x6": "^2.18.1",
+    "@antv/x6-plugin-dnd": "^2.1.1",
+    "@antv/x6-plugin-keyboard": "^2.2.3",
+    "@antv/x6-plugin-selection": "^2.2.2",
+    "@antv/x6-plugin-snapline": "^2.1.7",
+    "@antv/x6-plugin-transform": "^2.1.8",
+    "@antv/x6-react-shape": "^2.2.3",
+    "@turf/boolean-contains": "^6.5.0",
+    "@turf/helpers": "^6.5.0",
+    "@turf/intersect": "^6.5.0",
+    "@umijs/plugins": "^4.1.1",
+    "ahooks": "^3.7.10",
+    "antd": "^5.14.0",
+    "axios": "^1.6.7",
+    "classnames": "^2.5.1",
+    "dayjs": "^1.11.10",
+    "highcharts": "^11.3.0",
+    "highlight.js": "^11.9.0",
+    "js-cookie": "^3.0.5",
+    "lodash": "^4.17.21",
+    "lottie-web": "^5.12.2",
+    "query-string": "^8.2.0",
+    "react": "^18.2.0",
+    "react-currency-input-field": "^3.6.12",
+    "react-dev-inspector": "^2.0.1",
+    "react-dom": "^18.2.0",
+    "umi": "^4.1.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.202",
+    "@types/react": "^18.2.52",
+    "@types/react-dom": "^18.2.18",
+    "@types/uuid": "^9.0.8",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.1",
+    "eslint": "^8.56.0",
+    "lint-staged": "^13.2.3",
+    "prettier": "^2.8.7",
+    "prettier-plugin-organize-imports": "^3.2.2",
+    "prettier-plugin-packagejson": "^2.4.3",
+    "stylelint": "^15.11.0",
+    "typescript": "^5.3.3"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  }
+}

@@ -1,0 +1,53 @@
+#root{
+  height: 100vh;
+  overflow: auto;
+  background: #f1f1f1;
+}
+
+// 滚动条
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+// 箭头按钮
+::-webkit-scrollbar-button {
+  width: 12px;
+  height: 12px;
+  background-color: #fff;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+// 箭头按钮上
+::-webkit-scrollbar-button:vertical:start{
+  background-image: url('~@/assets/scrollbar/arrowUp.svg');
+}
+// 箭头按钮下
+::-webkit-scrollbar-button:vertical:end{
+  background-image: url('~@/assets/scrollbar/arrowDown.svg');
+}
+// 箭头按钮左
+::-webkit-scrollbar-button:horizontal:start{
+  background-image: url('~@/assets/scrollbar/arrowLeft.svg');
+}
+// 箭头按钮右
+::-webkit-scrollbar-button:horizontal:end{
+  background-image: url('~@/assets/scrollbar/arrowRight.svg');
+}
+// 去掉滚动条上不需要的按钮
+::-webkit-scrollbar-button:vertical:start:increment,
+::-webkit-scrollbar-button:vertical:end:decrement,
+::-webkit-scrollbar-button:horizontal:start:increment,
+::-webkit-scrollbar-button:horizontal:end:decrement {
+  display: none;
+}
+// 滚动条滑块
+::-webkit-scrollbar-thumb {
+  height: 50px;
+  background: #A7B0AB;
+  border-radius: 6px;
+  border: 3px solid #fff;
+}
+// 滚动条滑轨
+::-webkit-scrollbar-track {
+  background: #fff;
+}

@@ -1,0 +1,44 @@
+.toolbarPanel{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+
+  .left{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+
+    .iconButton:not(:last-child){
+      margin-right: 12px;
+    }
+  }
+
+  .right{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+}
+
+.iconButton{
+  width: 26px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6B7570;
+  cursor: pointer;
+}
+
+.iconButton:not(.iconButtonDisabled):hover{
+  background: #e0e0e0;
+}
+
+.iconButton.iconButtonDisabled{
+  opacity: 0.4;
+  cursor: not-allowed;
+}

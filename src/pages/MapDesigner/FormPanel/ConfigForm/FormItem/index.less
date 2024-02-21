@@ -1,0 +1,26 @@
+.formItem{
+  width: 100%;
+  display: flex;
+
+  .label{
+    flex: 1;
+    font-size: 14px;
+    line-height: 32px;
+    color: rgba(34, 39, 37, 60%);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .component{
+    width: 120px;
+    flex: none;
+    margin-left: 8px;
+
+    :global{
+      .ant-select{
+        width: 100%;
+      }
+    }
+  }
+}

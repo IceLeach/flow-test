@@ -1,0 +1,9 @@
+**/*.md
+**/*.svg
+**/*.ejs
+**/*.html
+node_modules
+.umi
+.umi-production
+.umi-test
+iconpark.js
