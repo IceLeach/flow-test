@@ -10,10 +10,32 @@ import DndPanel, { DndAssetType } from './DndPanel';
 import ToolbarPanel from './ToolbarPanel';
 import FormPanel, { FormPanelActions } from './FormPanel';
 import KeyboardPanel from './KeyboardPanel';
-import { cellDataLog, foramtMapData, getAssetNodes, getBackgroundNode, getGraphData, isBreachOfRules, loadData } from './utils';
+import { cellDataLog, foramtMapData, foramtToMapData, getAssetNodes, getBackgroundNode, getGraphData, isBreachOfRules, loadData } from './utils';
 import { HistoryType } from './types';
 import { testData, testData2 } from './testData';
 import styles from './index.less';
+
+type SaveAssetType = {
+  id: string;
+  name: string;
+  type: string;
+  used: true;
+  x: number;
+  y: number;
+} | {
+  id: string;
+  name: string;
+  type: string;
+  used: false;
+  x: undefined;
+  y: undefined;
+}
+
+export type SaveOptions = {
+  roomId: number;
+  data: string;
+  assets: SaveAssetType[];
+}
 
 type MapDesignerProps = {
   roomId: number;
@@ -25,8 +47,8 @@ type MapDesignerProps = {
   highlightAsset?: string;
   /** 获取机房下资产的名称 */
   getRoomAssetsName: (roomId: number) => Record<string, string>;
-  // /** 触发保存时 */
-  // onSave: (saveData: any, waitAssets: string[]) => void;
+  /** 触发保存时 */
+  onSave: (data: SaveOptions) => void;
 }
 
 export type SaveCheck = {
@@ -52,7 +74,7 @@ const getAsset = async (data: { roomId: number }) => {
 }
 
 const MapDesigner: React.FC<MapDesignerProps> = (props) => {
-  const { roomId, dndPanelContainerRef, onStatusChange, highlightAsset, getRoomAssetsName } = props;
+  const { roomId, dndPanelContainerRef, onStatusChange, highlightAsset, getRoomAssetsName, onSave } = props;
   const [graph, setGraph] = useState<Graph>();
   // 选中的节点
   const [selectedNodes, setSelectedNodes] = useState<Node[]>([]);
@@ -278,6 +300,25 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
     }
   }, [highlightAsset, graph]);
 
+  const saveToServer = () => {
+    if (!graph) return;
+    const mapData = foramtToMapData(graph);
+    const assetNodes = getAssetNodes(graph);
+    onSave({
+      roomId,
+      data: JSON.stringify(mapData),
+      assets: dndAssets.map(d => {
+        if (d.used) {
+          const assetNode = assetNodes.find(item => item.getData().asset.id === d.id)!;
+          const { x, y } = assetNode.getPosition();
+          return { ...d, used: true, x, y };
+        } else {
+          return { ...d, used: false, x: undefined, y: undefined };
+        }
+      }),
+    });
+  }
+
   return (
     <div className={styles.page}>
       {dndPanelContainerRef?.current && createPortal(
@@ -291,6 +332,7 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
             selectedNodes={selectedNodes}
             history={history}
             saveData={trySaveData}
+            saveToServer={saveToServer}
           />
         </div>
         <div className={styles.container}>

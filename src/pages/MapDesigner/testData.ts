@@ -2,7 +2,6 @@ import { MapType } from "./types";
 
 export const testData: MapType = {
   container: {
-    type: 'room',
     width: 1600,
     height: 800,
   },
@@ -162,7 +161,6 @@ export const testData: MapType = {
 
 export const testData2: MapType = {
   container: {
-    type: 'room',
     width: 1600,
     height: 800,
   },

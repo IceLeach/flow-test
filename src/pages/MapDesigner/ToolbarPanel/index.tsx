@@ -17,6 +17,7 @@ type ToolbarPanelProps = {
   selectedNodes?: Node[];
   history?: HistoryType;
   saveData: (saveCheck?: SaveCheck) => void;
+  saveToServer: () => void;
 };
 
 type IconButtonProps = {
@@ -46,7 +47,7 @@ const IconButton: React.FC<IconButtonProps> = (props) => {
 }
 
 const ToolbarPanel: React.FC<ToolbarPanelProps> = (props) => {
-  const { selectedNodes, graph, history, saveData } = props;
+  const { selectedNodes, graph, history, saveData, saveToServer } = props;
 
   const checkedSelectedNodes = useMemo(() => {
     return excludeReadonlyCells(selectedNodes ?? []) as Node[];
@@ -108,6 +109,7 @@ const ToolbarPanel: React.FC<ToolbarPanelProps> = (props) => {
     if (!graph) return;
     const data = getGraphData(graph);
     console.log('save', data)
+    saveToServer();
   }
 
   return (

@@ -1,7 +1,7 @@
 import { Graph } from "@antv/x6";
 import { backgroundNodeShape, defaultZIndex } from "../config";
 import { ComponentNodeType, ComponentType, MapType } from "../types";
-import { createBackgroundZIndex, createNodeId } from ".";
+import { createBackgroundZIndex, createNodeId, getBackgroundNode, isBackgroundNode } from ".";
 
 /** 处理原始数据 将原始组件转换为组件节点 */
 export const OriginComponentsToComponentNodes = (components: ComponentType[]): ComponentNodeType[] => {
@@ -53,6 +53,37 @@ export const foramtMapData = (data: MapType, assetsNameMap: Record<string, strin
   const backgroundNodeZIndex = createBackgroundZIndex(componentNodes);
   const backgroundNode = createBackgroundNode({ width: container.width ?? 0, height: container.height ?? 0, zIndex: backgroundNodeZIndex });
   return [backgroundNode, ...componentNodes];
+}
+
+/** 将当前数据处理成最终产物 */
+export const foramtToMapData = (graph: Graph): MapType => {
+  const nodes = graph.getNodes();
+  const backgroundNode = getBackgroundNode(graph);
+  const backgroundSize = backgroundNode?.getSize();
+  const componentNodes = nodes.filter(d => !isBackgroundNode(d));
+  return {
+    container: {
+      width: backgroundSize?.width,
+      height: backgroundSize?.height,
+    },
+    components: componentNodes.map(node => {
+      const position = node.getPosition();
+      const size = node.getSize();
+      const data = node.getData();
+      return {
+        id: node.id,
+        type: node.shape,
+        x: position.x,
+        y: position.y,
+        width: size.width,
+        height: size.height,
+        zIndex: node.getZIndex(),
+        angle: node.getAngle(),
+        config: data.config,
+        asset: data.asset,
+      }
+    }),
+  };
 }
 
 /** 加载数据 */

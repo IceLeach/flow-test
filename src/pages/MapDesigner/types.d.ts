@@ -1,6 +1,5 @@
 /** 原始容器 */
 export type ContainerType = {
-  type: 'room';
   width?: number;
   height?: number;
 }
