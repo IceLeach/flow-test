@@ -159,3 +159,23 @@ export const testData: MapType = {
     },
   ],
 };
+
+export const testData2: MapType = {
+  container: {
+    type: 'room',
+    width: 1600,
+    height: 800,
+  },
+  components: [
+    {
+      type: 'STORE',
+      x: 20,
+      y: 20,
+      width: 60,
+      height: 100,
+      zIndex: 10,
+      config: { direction: 'up' },
+      asset: { id: '22_2', name: 'A222' },
+    },
+  ],
+};

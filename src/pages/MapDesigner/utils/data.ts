@@ -46,10 +46,10 @@ export const createBackgroundNode = (data: { width: number; height: number; zInd
   }
 }
 
-/** 处理原始数据 */
-export const foramtMapData = (data: MapType): ComponentNodeType[] => {
+/** 处理原始数据并替换资产组件的名称 */
+export const foramtMapData = (data: MapType, assetsNameMap: Record<string, string>): ComponentNodeType[] => {
   const { container, components } = data;
-  const componentNodes = OriginComponentsToComponentNodes(components);
+  const componentNodes = OriginComponentsToComponentNodes(components.map(d => ({ ...d, asset: d.asset ? { ...d.asset, name: assetsNameMap[d.asset.id] ?? d.asset.name } : undefined })));
   const backgroundNodeZIndex = createBackgroundZIndex(componentNodes);
   const backgroundNode = createBackgroundNode({ width: container.width ?? 0, height: container.height ?? 0, zIndex: backgroundNodeZIndex });
   return [backgroundNode, ...componentNodes];

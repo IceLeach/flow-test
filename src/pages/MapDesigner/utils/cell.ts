@@ -96,3 +96,8 @@ export const isAssetNode = (node: Node): boolean => {
   const data = node.getData();
   return !!data.asset;
 }
+
+/** 获取所有资产节点 */
+export const getAssetNodes = (graph: Graph): Node[] => {
+  return graph.getNodes().filter(node => isAssetNode(node));
+}

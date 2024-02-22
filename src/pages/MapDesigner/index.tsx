@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Graph, Node } from '@antv/x6';
+import { CellView, Graph, Node } from '@antv/x6';
 import { Dnd } from '@antv/x6-plugin-dnd';
 import { Store } from './utils/store';
 import { defaultZIndex } from './config';
@@ -10,9 +10,9 @@ import DndPanel, { DndAssetType } from './DndPanel';
 import ToolbarPanel from './ToolbarPanel';
 import FormPanel, { FormPanelActions } from './FormPanel';
 import KeyboardPanel from './KeyboardPanel';
-import { cellDataLog, foramtMapData, getBackgroundNode, getGraphData, isBreachOfRules, loadData } from './utils';
+import { cellDataLog, foramtMapData, getAssetNodes, getBackgroundNode, getGraphData, isBreachOfRules, loadData } from './utils';
 import { HistoryType } from './types';
-import { testData } from './testData';
+import { testData, testData2 } from './testData';
 import styles from './index.less';
 
 type MapDesignerProps = {
@@ -21,6 +21,12 @@ type MapDesignerProps = {
   dndPanelContainerRef: React.RefObject<HTMLElement>;
   /** 加载状态改变时 */
   onStatusChange: (status: 'loading' | 'finished' | 'error') => void;
+  /** 高亮的资产 */
+  highlightAsset?: string;
+  /** 获取机房下资产的名称 */
+  getRoomAssetsName: (roomId: number) => Record<string, string>;
+  // /** 触发保存时 */
+  // onSave: (saveData: any, waitAssets: string[]) => void;
 }
 
 export type SaveCheck = {
@@ -32,7 +38,7 @@ export type SaveCheck = {
 const getData = async (data: { roomId: number }) => {
   return {
     roomId: data.roomId,
-    data: testData,
+    data: data.roomId === 1 ? testData : testData2,
   }
 }
 const getAsset = async (data: { roomId: number }) => {
@@ -46,7 +52,7 @@ const getAsset = async (data: { roomId: number }) => {
 }
 
 const MapDesigner: React.FC<MapDesignerProps> = (props) => {
-  const { roomId, dndPanelContainerRef, onStatusChange } = props;
+  const { roomId, dndPanelContainerRef, onStatusChange, highlightAsset, getRoomAssetsName } = props;
   const [graph, setGraph] = useState<Graph>();
   // 选中的节点
   const [selectedNodes, setSelectedNodes] = useState<Node[]>([]);
@@ -65,18 +71,11 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
   const selectedNodesRef = useRef<Node[]>([]);
   // 避免闭包时使用
   const backgroundNodeRef = useRef<Node>();
+  const highlightCellViewRef = useRef<CellView>();
 
   graphRef.current = graph;
   selectedNodesRef.current = selectedNodes;
   backgroundNodeRef.current = backgroundNode;
-
-  /** 重置状态 每次初始化时使用 */
-  const beforeInit = () => {
-    setSelectedNodes([]);
-    setBackgroundNode(undefined);
-    setHistory(undefined);
-    setDndAssets([]);
-  }
 
   /** 刷新待部署设备 数据重新加载时使用 */
   const reloadDndAssets = () => {
@@ -189,7 +188,6 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
 
   useEffect(() => {
     onStatusChange('loading');
-    beforeInit();
     const igraph = createGraph({
       graph: { container: containerRef.current! },
     });
@@ -239,7 +237,7 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
     storeRef.current = store;
     // 加载数据
     getData({ roomId }).then(res => {
-      const graphData = foramtMapData(res.data);
+      const graphData = foramtMapData(res.data, getRoomAssetsName(roomId));
       loadData(igraph, graphData);
       store.reset(graphData);
       updateHistoryData();
@@ -256,8 +254,29 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
       onStatusChange('error');
     });
 
-    return () => igraph.dispose();
+    return () => {
+      setGraph(undefined);
+      setSelectedNodes([]);
+      setBackgroundNode(undefined);
+      setHistory(undefined);
+      setDndAssets([]);
+      highlightCellViewRef.current = undefined;
+    };
   }, [roomId]);
+
+  useEffect(() => {
+    if (graph) {
+      const assetNodes = getAssetNodes(graph);
+      const highlightNode = assetNodes.find(d => d.getData().asset.id === highlightAsset);
+      highlightCellViewRef.current?.unhighlight();
+      highlightCellViewRef.current = undefined;
+      const newHighlightCellView = highlightNode ? graph.findViewByCell(highlightNode) : null;
+      if (newHighlightCellView) {
+        newHighlightCellView.highlight();
+        highlightCellViewRef.current = newHighlightCellView;
+      }
+    }
+  }, [highlightAsset, graph]);
 
   return (
     <div className={styles.page}>
