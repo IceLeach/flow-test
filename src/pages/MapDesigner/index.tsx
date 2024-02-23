@@ -210,7 +210,7 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
 
   useEffect(() => {
     onStatusChange('loading');
-    const igraph = createGraph({
+    const igraph = graphRef.current ?? createGraph({
       graph: { container: containerRef.current! },
     });
     setGraph(igraph);
@@ -277,7 +277,6 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
     });
 
     return () => {
-      setGraph(undefined);
       setSelectedNodes([]);
       setBackgroundNode(undefined);
       setHistory(undefined);

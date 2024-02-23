@@ -6,6 +6,7 @@ export default [
       { path: '/', redirect: '/guide' },
       { path: '/guide', component: './Guide' },
       { path: '/configuration', component: './Configuration' },
+      { path: '/visualization', component: './Visualization' },
     ],
   },
 ];

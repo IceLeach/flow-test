@@ -8,12 +8,13 @@ type WIRINGConfig = {
 
 const WIRING: CustomComponent<WIRINGConfig> = (props) => {
   const { node } = props;
-  const { config } = node.getData();
+  const { config, env } = node.getData();
+  const color = env.type === 'plan' ? '#9ca0a3' : '#00FEFF';
 
   return (
     <DirectedEquip
       direction={config?.direction ?? 'up'}
-      borderColor='#A8A8A8'
+      borderColor={color}
       icon={<Icon type='icon-jigui' />}
     />
   );

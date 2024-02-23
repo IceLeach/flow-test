@@ -8,12 +8,13 @@ type UPSConfig = {
 
 const UPS: CustomComponent<UPSConfig> = (props) => {
   const { node } = props;
-  const { config } = node.getData();
+  const { config, env } = node.getData();
+  const color = env.type === 'plan' ? '#9ca0a3' : '#FAC858';
 
   return (
     <DirectedEquip
       direction={config?.direction ?? 'up'}
-      borderColor='#FAC858'
+      borderColor={color}
       icon={<Icon type='icon-UPS' />}
     />
   );

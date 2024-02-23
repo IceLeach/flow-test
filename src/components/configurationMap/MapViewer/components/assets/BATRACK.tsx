@@ -9,8 +9,9 @@ type BATRACKConfig = {
 
 const BATRACK: CustomComponent<BATRACKConfig> = (props) => {
   const { node } = props;
-  const { config } = node.getData();
+  const { config, env } = node.getData();
   const { direction, column, row } = config;
+  const color = env.type === 'plan' ? '#9ca0a3' : undefined;
 
   const group: number[][] = [];
   let graphRow = row;
@@ -42,7 +43,7 @@ const BATRACK: CustomComponent<BATRACKConfig> = (props) => {
               style={{ height: '100%', width: `calc(100% / ${graphColumn})` }}
               key={`${rowIndex}-${itemIndex}`}
             >
-              <BatRackItem direction={direction ?? 'up'} />
+              <BatRackItem direction={direction ?? 'up'} color={color} />
             </div>
           ))}
         </div>

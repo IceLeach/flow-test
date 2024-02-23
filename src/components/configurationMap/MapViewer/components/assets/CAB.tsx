@@ -8,12 +8,13 @@ type CABConfig = {
 
 const CAB: CustomComponent<CABConfig> = (props) => {
   const { node } = props;
-  const { config } = node.getData();
+  const { config, env } = node.getData();
+  const color = env.type === 'plan' ? '#9ca0a3' : '#EE6666';
 
   return (
     <DirectedEquip
       direction={config?.direction ?? 'up'}
-      borderColor='#EE6666'
+      borderColor={color}
       icon={<Icon type='icon-shandian' />}
     />
   );

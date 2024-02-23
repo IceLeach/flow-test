@@ -8,12 +8,13 @@ type BATConfig = {
 
 const BAT: CustomComponent<BATConfig> = (props) => {
   const { node } = props;
-  const { config } = node.getData();
+  const { config, env } = node.getData();
+  const color = env.type === 'plan' ? '#9ca0a3' : '#91CC75';
 
   return (
     <DirectedEquip
       direction={config?.direction ?? 'up'}
-      borderColor='#91CC75'
+      borderColor={color}
       icon={<Icon type='icon-a-dianchixiangdianchijia' />}
     />
   );

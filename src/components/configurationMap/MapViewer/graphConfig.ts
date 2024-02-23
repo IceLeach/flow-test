@@ -39,8 +39,8 @@ const graphConfig: Omit<GraphOptions, 'container'> = {
     enabled: true,
     // modifiers: 'Ctrl',
   },
-  interacting: cellView => {
-    return !isReadonlyCell(cellView.cell);
+  interacting: () => {
+    return false;
   },
 };
 

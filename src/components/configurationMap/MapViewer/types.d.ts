@@ -33,10 +33,18 @@ export type MapType = {
   components: ComponentType[];
 }
 
+export type PlanModeItemStatus = 'HH' | 'H' | 'M' | 'L' | 'LL';
+
 /** 组件节点的业务数据 内部类型 */
 export type ComponentNodeData<T extends ComponentConfigType = ComponentConfigType> = {
   config: T;
   asset?: ComponentAssetType;
+  env: {
+    type: 'default' | 'heatMap';
+  } | {
+    type: 'plan';
+    status?: PlanModeItemStatus;
+  };
 }
 
 /** 组件节点 内部类型 */

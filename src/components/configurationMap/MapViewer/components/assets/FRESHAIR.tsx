@@ -8,14 +8,15 @@ type FRESHAIRConfig = {
 
 const FRESHAIR: CustomComponent<FRESHAIRConfig> = (props) => {
   const { node } = props;
-  const { config } = node.getData();
+  const { config, env } = node.getData();
   const direction = config?.direction ?? 'up';
+  const color = env.type === 'plan' ? '#9ca0a3' : '#73C0DE';
 
   const horizontalComponent = (transform: boolean = false) => (
     <div
       style={{
         display: 'flex',
-        border: '2px solid #73C0DE',
+        border: `2px solid ${color}`,
         borderRadius: 4,
         width: '100%',
         height: '100%',
@@ -39,7 +40,7 @@ const FRESHAIR: CustomComponent<FRESHAIRConfig> = (props) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#73C0DE',
+            color: color,
           }}
         >
           <Icon type="icon-xinfeng1" className={globalStyle.resizeIcon} />
@@ -54,10 +55,10 @@ const FRESHAIR: CustomComponent<FRESHAIRConfig> = (props) => {
           justifyContent: 'space-evenly',
         }}
       >
-        <div style={{ height: 2, width: '80%', background: '#73C0DE' }} />
-        <div style={{ height: 2, width: '80%', background: '#73C0DE' }} />
-        <div style={{ height: 2, width: '80%', background: '#73C0DE' }} />
-        <div style={{ height: 2, width: '80%', background: '#73C0DE' }} />
+        <div style={{ height: 2, width: '80%', background: color }} />
+        <div style={{ height: 2, width: '80%', background: color }} />
+        <div style={{ height: 2, width: '80%', background: color }} />
+        <div style={{ height: 2, width: '80%', background: color }} />
       </div>
     </div>
   );
@@ -66,7 +67,7 @@ const FRESHAIR: CustomComponent<FRESHAIRConfig> = (props) => {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        border: '2px solid #73C0DE',
+        border: `2px solid ${color}`,
         width: '100%',
         height: '100%',
         transform: `rotate(${transform ? 180 : 0}deg)`,
@@ -89,7 +90,7 @@ const FRESHAIR: CustomComponent<FRESHAIRConfig> = (props) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#73C0DE',
+            color: color,
           }}
         >
           <Icon type="icon-xinfeng1" className={globalStyle.resizeIcon} />
@@ -98,10 +99,10 @@ const FRESHAIR: CustomComponent<FRESHAIRConfig> = (props) => {
       <div
         style={{ height: '30%', width: '100%', display: 'flex', justifyContent: 'space-evenly' }}
       >
-        <div style={{ width: 2, height: '80%', background: '#73C0DE' }} />
-        <div style={{ width: 2, height: '80%', background: '#73C0DE' }} />
-        <div style={{ width: 2, height: '80%', background: '#73C0DE' }} />
-        <div style={{ width: 2, height: '80%', background: '#73C0DE' }} />
+        <div style={{ width: 2, height: '80%', background: color }} />
+        <div style={{ width: 2, height: '80%', background: color }} />
+        <div style={{ width: 2, height: '80%', background: color }} />
+        <div style={{ width: 2, height: '80%', background: color }} />
       </div>
     </div>
   );

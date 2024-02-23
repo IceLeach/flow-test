@@ -1,0 +1,99 @@
+.mapContainer{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .fastSearch{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+  }
+
+  .viewer{
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .mapBottom {
+    width: 100%;
+    flex: none;
+    display: flex;
+    justify-content: center;
+
+    .mapBottomContainer {
+      display: flex;
+
+      .numberRow {
+        width: 440px;
+        display: flex;
+        justify-content: space-between;
+
+        .numberBlock {
+          .numberItem {
+            display: flex;
+            align-items: center;
+
+            .icon {
+              font-size: 14px;
+              margin-right: 8px;
+            }
+
+            .title {
+              font-weight: bold;
+              display: flex;
+              justify-content: center;
+            }
+
+            .value {
+              font-weight: bold;
+            }
+
+            .valueNumber {
+              font-weight: bold;
+              color: #44B979;
+              margin-left: 8px;
+            }
+          }
+        }
+      }
+
+      .legend {
+        display: flex;
+        justify-content: center;
+        margin-left: 48px;
+
+        .legendItem {
+          width: 70px;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+
+          .block {
+            width: 14px;
+            height: 14px;
+            margin-right: 8px;
+          }
+        }
+
+        .legendItem:not(:last-child) {
+          margin-right: 16px;
+        }
+      }
+    }
+  }
+
+  .loading{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

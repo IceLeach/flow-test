@@ -1,10 +1,11 @@
 import { Graph } from "@antv/x6";
 import { backgroundNodeShape, defaultZIndex } from "../config";
 import { ComponentNodeType, ComponentType, MapType } from "../types";
-import { createBackgroundZIndex, createNodeId, getBackgroundNode, isBackgroundNode } from ".";
+import { ViewerMode } from "..";
+import { createBackgroundZIndex, createNodeId, getAssetNodes, getBackgroundNode, isBackgroundNode } from ".";
 
 /** 处理原始数据 将原始组件转换为组件节点 */
-export const OriginComponentsToComponentNodes = (components: ComponentType[]): ComponentNodeType[] => {
+export const OriginComponentsToComponentNodes = (components: ComponentType[], mode?: ViewerMode): ComponentNodeType[] => {
   return components.map((component) => ({
     id: component.id ?? createNodeId(),
     shape: component.type,
@@ -21,12 +22,16 @@ export const OriginComponentsToComponentNodes = (components: ComponentType[]): C
     data: {
       config: component.config,
       asset: component.asset,
+      env: {
+        type: mode?.type ?? 'default',
+        status: component.asset && mode?.type === 'plan' ? mode.data[component.asset.id] : undefined,
+      },
     },
   }));
 }
 
 /** 生成背景组件 */
-export const createBackgroundNode = (data: { width: number; height: number; zIndex: number }): ComponentNodeType => {
+export const createBackgroundNode = (data: { width: number; height: number; zIndex: number }, mode?: ViewerMode): ComponentNodeType => {
   const { width, height, zIndex } = data;
   return {
     id: createNodeId(),
@@ -42,6 +47,9 @@ export const createBackgroundNode = (data: { width: number; height: number; zInd
     zIndex: zIndex,
     data: {
       config: {},
+      env: {
+        type: mode?.type ?? 'default',
+      },
     },
   }
 }
@@ -105,4 +113,27 @@ export const getGraphData = (graph: Graph): ComponentNodeType[] => {
     angle: d.angle,
     data: d.data,
   }));
+}
+
+/** 更新节点展示模式 */
+export const updateNodeEnv = (graph: Graph, mode?: ViewerMode) => {
+  const assetNodes = getAssetNodes(graph);
+  if (!mode) {
+    assetNodes.forEach(node => {
+      const data = node.getData();
+      node.setData({ ...data, env: { type: 'default' } });
+    });
+  } else if (mode.type === 'plan') {
+    const modeData = mode.data;
+    assetNodes.forEach(node => {
+      const data = node.getData();
+      const { asset } = data;
+      node.setData({ ...data, env: { type: 'plan', status: modeData[asset.id] } });
+    });
+  } else if (mode.type === 'heatMap') {
+    assetNodes.forEach(node => {
+      const data = node.getData();
+      node.setData({ ...data, env: { type: 'heatMap' } });
+    });
+  }
 }

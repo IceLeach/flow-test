@@ -8,12 +8,13 @@ type FIREHOSTConfig = {
 
 const FIREHOST: CustomComponent<FIREHOSTConfig> = (props) => {
   const { node } = props;
-  const { config } = node.getData();
+  const { config, env } = node.getData();
+  const color = env.type === 'plan' ? '#9ca0a3' : '#FC8452';
 
   return (
     <DirectedEquip
       direction={config?.direction ?? 'up'}
-      borderColor='#FC8452'
+      borderColor={color}
       icon={<Icon type='icon-yangan' />}
     />
   );
