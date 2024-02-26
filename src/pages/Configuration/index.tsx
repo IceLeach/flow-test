@@ -3,6 +3,8 @@ import { App, Spin } from 'antd';
 import Icon from '@/components/Icon';
 import SearchTree from '@/components/SearchTree';
 import { equIconList } from '@/pages/asset/Classification/config';
+import { cmdbBizRoomConfigurationGetTreeListGet } from '@/services';
+import { CmdbBizRoomConfigurationGetTreeListGetResData } from '@/types';
 import MapDesigner, { SaveOptions } from '../MapDesigner';
 import styles from './index.less';
 
@@ -24,26 +26,6 @@ type TreeRoomType = {
   children?: TreeAssetType[];
 }
 
-const getTree = async () => ({
-  data: [
-    {
-      id: 1,
-      name: '机房1',
-      children: [
-        { id: 1, name: 'A011', type: '2', icon: 'STORE' },
-        { id: 2, name: 'A022', type: '2', icon: 'NET' },
-      ],
-    },
-    {
-      id: 2,
-      name: '机房2',
-      children: [
-        { id: 22, name: 'A222', type: '2', icon: 'STORE' },
-      ],
-    },
-  ],
-})
-
 type SaveType = {
   roomId: number;
   jsonData: string;
@@ -60,17 +42,17 @@ type SaveType = {
 }
 const save = async (d: SaveType) => ({ d })
 
-const formatTreeData = (data: any[]): TreeRoomType[] => {
+const formatTreeData = (data: CmdbBizRoomConfigurationGetTreeListGetResData): TreeRoomType[] => {
   return data.map(d => ({
     type: 'room',
-    key: d.id,
+    key: Number(d.id),
     title: d.name,
     name: d.name,
     icon: <Icon type="icon-jifang" />,
     children: d.children.map((item: any) => ({
       type: 'asset',
       key: `${item.id}_${item.type}`,
-      parentKey: d.id,
+      parentKey: Number(d.id),
       title: item.name,
       name: item.name,
       icon: equIconList.find((d) => d.type === item.icon)?.icon,
@@ -92,7 +74,7 @@ const Configuration: React.FC = () => {
 
   useEffect(() => {
     setStatus('loading');
-    getTree().then(res => {
+    cmdbBizRoomConfigurationGetTreeListGet().then(res => {
       const tree = formatTreeData(res.data);
       setTreeData(tree);
       if (tree?.length) {
@@ -108,7 +90,7 @@ const Configuration: React.FC = () => {
 
   const reloadTree = () => {
     setStatus('loading');
-    getTree().then(res => {
+    cmdbBizRoomConfigurationGetTreeListGet().then(res => {
       const tree = formatTreeData(res.data);
       setTreeData(tree);
       if (!tree?.length) {

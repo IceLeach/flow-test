@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CellView, Graph, Node } from '@antv/x6';
 import { createGraph } from './graphConfig';
 import { registerNode } from './register';
-import { foramtMapData, getAssetNodes, getBackgroundNode, isAssetNode, loadData, updateNodeEnv } from './utils';
-import { PlanModeItemStatus } from './types';
-import { testData, testData2 } from '@/pages/MapDesigner/testData';
+import { foramtMapData, getAssetNodes, getBackgroundNode, isAssetNode, jsonToMapData, loadData, updateNodeEnv } from './utils';
+import { HeatMapModeData, PlanModeItemStatus } from './types';
 import styles from './index.less';
+import { cmdbBizRoomConfigurationFindGet, cmdbBizScreenConfigurationListGet } from '@/services';
 
 type SaveAssetType = {
   id: string;
@@ -34,11 +34,7 @@ export type ViewerMode = {
   data: Record<string, PlanModeItemStatus>;
 } | {
   type: 'heatMap';
-  data: {
-    x: number;
-    y: number;
-    value: number;
-  }[];
+  data: HeatMapModeData;
 }
 
 type MapViewerProps = {
@@ -50,25 +46,12 @@ type MapViewerProps = {
   mode?: ViewerMode;
   onAssetNodeMouseEnter?: (asset: { id: string, name: string }, e: MouseEvent) => void;
   onAssetNodeMouseLeave?: (asset: { id: string, name: string }, e: MouseEvent) => void;
+  onAssetNodeClick?: (asset: { id: string, name: string }, e: MouseEvent) => void;
   onAssetNodeDoubleClick?: (asset: { id: string, name: string }, e: MouseEvent) => void;
 }
 
-const getData = async (data: { roomId: number }) => {
-  return {
-    roomId: data.roomId,
-    data: data.roomId === 1 ? testData : testData2,
-  }
-}
-const cmdbBizScreenConfigurationListGet = async (data: { roomId: number }) => ({
-  roomId: data.roomId,
-  data: [
-    { id: 1, name: 'A011', type: '2' },
-    { id: 2, name: 'A022', type: '2' },
-  ],
-})
-
 const MapViewer: React.FC<MapViewerProps> = (props) => {
-  const { roomId, onStatusChange, highlightAsset, mode, onAssetNodeMouseEnter, onAssetNodeMouseLeave, onAssetNodeDoubleClick } = props;
+  const { roomId, onStatusChange, highlightAsset, mode, onAssetNodeMouseEnter, onAssetNodeMouseLeave, onAssetNodeClick, onAssetNodeDoubleClick } = props;
   const [graph, setGraph] = useState<Graph>();
   // 背景节点
   const [backgroundNode, setBackgroundNode] = useState<Node>();
@@ -104,6 +87,12 @@ const MapViewer: React.FC<MapViewerProps> = (props) => {
         onAssetNodeMouseLeave(node.getData().asset, e.originalEvent);
       }
     });
+    igraph.on('node:click', (data) => {
+      const { node, e } = data;
+      if (isAssetNode(node) && onAssetNodeClick) {
+        onAssetNodeClick(node.getData().asset, e.originalEvent);
+      }
+    });
     igraph.on('node:dblclick', (data) => {
       const { node, e } = data;
       if (isAssetNode(node) && onAssetNodeDoubleClick) {
@@ -111,12 +100,12 @@ const MapViewer: React.FC<MapViewerProps> = (props) => {
       }
     });
     // 加载数据
-    Promise.all([getData({ roomId }), cmdbBizScreenConfigurationListGet({ roomId })]).then(([dataRes, nameRes]) => {
+    Promise.all([cmdbBizRoomConfigurationFindGet({ roomId: `${roomId}` }), cmdbBizScreenConfigurationListGet({ roomId: `${roomId}` })]).then(([dataRes, nameRes]) => {
       const nameMap: Record<string, string> = {};
       nameRes.data.forEach((d) => {
         nameMap[`${d.id}_${d.type}`] = d.name;
       });
-      const graphData = foramtMapData(dataRes.data, nameMap);
+      const graphData = foramtMapData(jsonToMapData(dataRes.data), nameMap);
       loadData(igraph, graphData);
       setBackgroundNode(getBackgroundNode(igraph));
       setReadyRoomId(roomId);

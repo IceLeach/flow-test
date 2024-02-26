@@ -2,7 +2,7 @@ import axios from 'axios';
 import { message } from 'antd';
 
 const request = axios.create({
-  baseURL: API_URL,
+  baseURL: 'http://60.12.212.225:8188',
 });
 
 request.interceptors.request.use(config => {

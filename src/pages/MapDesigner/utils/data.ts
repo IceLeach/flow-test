@@ -46,10 +46,69 @@ export const createBackgroundNode = (data: { width: number; height: number; zInd
   }
 }
 
+/** 解析元素数据 */
+export const jsonToMapData = (json: string | null): MapType => {
+  const jsonData = json ? JSON.parse(json) : { data: { type: 'room', width: 1200, height: 600, }, components: [] };
+  const { data, components } = jsonData;
+  return {
+    container: {
+      width: data.width,
+      height: data.height,
+    },
+    components: components.map((d: any) => {
+      const componentData = d.data ?? {};
+      const { isAsset, id, name, ...restData } = componentData;
+      return {
+        id: d.id,
+        type: d.name,
+        x: d.x,
+        y: d.y,
+        width: d.width,
+        height: d.height,
+        zIndex: d.zIndex,
+        angle: d.data?.rotate,
+        config: restData,
+        asset: isAsset ? { id, name } : undefined,
+      }
+    }),
+  };
+}
+
+/** 转换成储存格式 */
+export const mapDataToJson = (mapData: MapType): string => {
+  const { container, components } = mapData;
+  const jsonData = {
+    data: {
+      type: 'room',
+      width: container.width,
+      height: container.height,
+    },
+    components: components.map(d => ({
+      id: d.id,
+      name: d.type,
+      renderKey: d.type,
+      x: d.x,
+      y: d.y,
+      width: d.width,
+      height: d.height,
+      zIndex: d.zIndex,
+      data: {
+        ...d.config,
+        ...!!d.asset ? {
+          isAsset: true,
+          id: d.asset?.id,
+          name: d.asset?.name,
+        } : {},
+      },
+    })),
+  };
+  return JSON.stringify(jsonData);
+}
+
 /** 处理原始数据并替换资产组件的名称 */
 export const foramtMapData = (data: MapType, assetsNameMap: Record<string, string>): ComponentNodeType[] => {
   const { container, components } = data;
-  const componentNodes = OriginComponentsToComponentNodes(components.map(d => ({ ...d, asset: d.asset ? { ...d.asset, name: assetsNameMap[d.asset.id] ?? d.asset.name } : undefined })));
+  const componentNodes = OriginComponentsToComponentNodes(components.filter(d => !d.asset || !!assetsNameMap[d.asset.id]).map(d => ({ ...d, asset: d.asset ? { ...d.asset, name: assetsNameMap[d.asset.id] ?? d.asset.name } : undefined })));
   const backgroundNodeZIndex = createBackgroundZIndex(componentNodes);
   const backgroundNode = createBackgroundNode({ width: container.width ?? 0, height: container.height ?? 0, zIndex: backgroundNodeZIndex });
   return [backgroundNode, ...componentNodes];

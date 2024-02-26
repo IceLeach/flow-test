@@ -40,6 +40,21 @@ export const getNodeData = (node: Node): ComponentNodeType => {
   };
 }
 
+/** 创建组件节点 */
+export const createComponentNode = (graph: Graph, data: ComponentNodeType): Node => {
+  return graph.createNode({ ...data });
+}
+
+/** 更新组件节点 无法更新id和类型 */
+export const updateComponentNode = (node: Node, data: ComponentNodeType) => {
+  const { size, position, zIndex, angle } = data;
+  node.setSize(size);
+  node.setPosition(position);
+  node.setZIndex(zIndex);
+  node.rotate(angle ?? 0, { absolute: true });
+  node.setData(data.data);
+}
+
 /** 打印元素信息 开发调试时使用 */
 export const cellDataLog = (cells: Cell | Cell[], prefix?: string) => {
   const getCellData = (cell: Cell) => {

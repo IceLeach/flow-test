@@ -35,6 +35,18 @@ export type MapType = {
 
 export type PlanModeItemStatus = 'HH' | 'H' | 'M' | 'L' | 'LL';
 
+export type HeatMapModePoint = {
+  x: number;
+  y: number;
+  value: number;
+}
+
+export type HeatMapModeData = {
+  points: HeatMapModePoint[];
+  onMouseMove: (point: HeatMapModePoint | undefined, e: React.MouseEvent) => void;
+  onMouseLeave: (e: React.MouseEvent) => void;
+}
+
 /** 组件节点的业务数据 内部类型 */
 export type ComponentNodeData<T extends ComponentConfigType = ComponentConfigType> = {
   config: T;

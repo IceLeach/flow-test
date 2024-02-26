@@ -1,8 +1,8 @@
-import { Graph } from "@antv/x6";
+import { Graph, Node } from "@antv/x6";
 import { backgroundNodeShape, defaultZIndex } from "../config";
-import { ComponentNodeType, ComponentType, MapType } from "../types";
+import { ComponentNodeType, ComponentType, HeatMapModeData, MapType } from "../types";
 import { ViewerMode } from "..";
-import { createBackgroundZIndex, createNodeId, getAssetNodes, getBackgroundNode, isBackgroundNode } from ".";
+import { createBackgroundZIndex, createNodeId, getAssetNodes, getBackgroundNode, isBackgroundNode, setCellConfig } from ".";
 
 /** 处理原始数据 将原始组件转换为组件节点 */
 export const OriginComponentsToComponentNodes = (components: ComponentType[], mode?: ViewerMode): ComponentNodeType[] => {
@@ -54,10 +54,38 @@ export const createBackgroundNode = (data: { width: number; height: number; zInd
   }
 }
 
+/** 解析元素数据 */
+export const jsonToMapData = (json: string | null): MapType => {
+  const jsonData = json ? JSON.parse(json) : { data: { type: 'room', width: 1200, height: 600, }, components: [] };
+  const { data, components } = jsonData;
+  return {
+    container: {
+      width: data.width,
+      height: data.height,
+    },
+    components: components.map((d: any) => {
+      const componentData = d.data ?? {};
+      const { isAsset, id, name, ...restData } = componentData;
+      return {
+        id: d.id,
+        type: d.name,
+        x: d.x,
+        y: d.y,
+        width: d.width,
+        height: d.height,
+        zIndex: d.zIndex,
+        angle: d.data?.rotate,
+        config: restData,
+        asset: isAsset ? { id, name } : undefined,
+      }
+    }),
+  };
+}
+
 /** 处理原始数据并替换资产组件的名称 */
 export const foramtMapData = (data: MapType, assetsNameMap: Record<string, string>): ComponentNodeType[] => {
   const { container, components } = data;
-  const componentNodes = OriginComponentsToComponentNodes(components.map(d => ({ ...d, asset: d.asset ? { ...d.asset, name: assetsNameMap[d.asset.id] ?? d.asset.name } : undefined })));
+  const componentNodes = OriginComponentsToComponentNodes(components.filter(d => !d.asset || !!assetsNameMap[d.asset.id]).map(d => ({ ...d, asset: d.asset ? { ...d.asset, name: assetsNameMap[d.asset.id] ?? d.asset.name } : undefined })));
   const backgroundNodeZIndex = createBackgroundZIndex(componentNodes);
   const backgroundNode = createBackgroundNode({ width: container.width ?? 0, height: container.height ?? 0, zIndex: backgroundNodeZIndex });
   return [backgroundNode, ...componentNodes];
@@ -115,15 +143,53 @@ export const getGraphData = (graph: Graph): ComponentNodeType[] => {
   }));
 }
 
+/** 创建热力图节点 */
+const createHeatmapNode = (graph: Graph, data: HeatMapModeData): Node => {
+  const backgroundNode = getBackgroundNode(graph);
+  const size = backgroundNode?.getSize();
+  return graph.createNode({
+    id: createNodeId(),
+    shape: 'heatmap',
+    size: {
+      width: size?.width ?? 0,
+      height: size?.height ?? 0,
+    },
+    position: {
+      x: 0,
+      y: 0,
+    },
+    zIndex: 9999,
+    data: { config: data },
+  });
+}
+
+/** 更新热力图 data为false时删除热力图 */
+const updateHeatmap = (graph: Graph, data: HeatMapModeData | false) => {
+  const heatMapNode = graph.getNodes().find(node => node.shape === 'heatmap');
+  if (!data) {
+    if (heatMapNode) {
+      graph.removeNode(heatMapNode);
+    }
+    return;
+  }
+  if (!heatMapNode) {
+    createHeatmapNode(graph, data);
+  } else {
+    setCellConfig(heatMapNode, data);
+  }
+}
+
 /** 更新节点展示模式 */
 export const updateNodeEnv = (graph: Graph, mode?: ViewerMode) => {
   const assetNodes = getAssetNodes(graph);
   if (!mode) {
+    updateHeatmap(graph, false);
     assetNodes.forEach(node => {
       const data = node.getData();
       node.setData({ ...data, env: { type: 'default' } });
     });
   } else if (mode.type === 'plan') {
+    updateHeatmap(graph, false);
     const modeData = mode.data;
     assetNodes.forEach(node => {
       const data = node.getData();
@@ -131,6 +197,7 @@ export const updateNodeEnv = (graph: Graph, mode?: ViewerMode) => {
       node.setData({ ...data, env: { type: 'plan', status: modeData[asset.id] } });
     });
   } else if (mode.type === 'heatMap') {
+    updateHeatmap(graph, mode.data);
     assetNodes.forEach(node => {
       const data = node.getData();
       node.setData({ ...data, env: { type: 'heatMap' } });

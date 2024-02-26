@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CellView, Graph, Node } from '@antv/x6';
 import { Dnd } from '@antv/x6-plugin-dnd';
+import { isEqual } from 'lodash';
+import { cmdbBizRoomConfigurationFindGet, cmdbBizRoomConfigurationGetWaitGet } from '@/services';
 import { Store } from './utils/store';
 import { defaultZIndex } from './config';
 import { createGraph } from './graphConfig';
@@ -10,9 +12,8 @@ import DndPanel, { DndAssetType } from './DndPanel';
 import ToolbarPanel from './ToolbarPanel';
 import FormPanel, { FormPanelActions } from './FormPanel';
 import KeyboardPanel from './KeyboardPanel';
-import { cellDataLog, foramtMapData, foramtToMapData, getAssetNodes, getBackgroundNode, getGraphData, isBreachOfRules, loadData } from './utils';
-import { HistoryType } from './types';
-import { testData, testData2 } from './testData';
+import { cellDataLog, createComponentNode, foramtMapData, foramtToMapData, getAssetNodes, getBackgroundNode, getGraphData, isBreachOfRules, jsonToMapData, loadData, mapDataToJson, updateComponentNode } from './utils';
+import { ComponentNodeType, HistoryType } from './types';
 import styles from './index.less';
 
 type SaveAssetType = {
@@ -57,22 +58,6 @@ export type SaveCheck = {
   remove?: Node[];
 }
 
-const getData = async (data: { roomId: number }) => {
-  return {
-    roomId: data.roomId,
-    data: data.roomId === 1 ? testData : testData2,
-  }
-}
-const getAsset = async (data: { roomId: number }) => {
-  return {
-    roomId: data.roomId,
-    data: [
-      { id: 1, name: '设备1', icon: 'IT', type: '1' },
-      { id: 2, name: '设备2', icon: 'AC', type: '1' },
-    ],
-  }
-}
-
 const MapDesigner: React.FC<MapDesignerProps> = (props) => {
   const { roomId, dndPanelContainerRef, onStatusChange, highlightAsset, getRoomAssetsName, onSave } = props;
   const [graph, setGraph] = useState<Graph>();
@@ -84,6 +69,7 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
   const [history, setHistory] = useState<HistoryType>();
   // 待部署设备
   const [dndAssets, setDndAssets] = useState<DndAssetType[]>([]);
+  const [readyRoomId, setReadyRoomId] = useState<number>();
   const containerRef = useRef<HTMLDivElement>(null);
   const graphRef = useRef<Graph>();
   const dndRef = useRef<Dnd>();
@@ -135,7 +121,32 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
     if (!store || !graph) return;
     const value = store.getValue();
     if (!value) return;
-    graph.fromJSON(value);
+    const diff = getGraphData(graph);
+    if (diff) {
+      const valueStatus: Record<string, boolean> = {};
+      value.forEach(d => {
+        valueStatus[d.id] = false;
+      });
+      const updateItems: ComponentNodeType[] = [];
+      const deleteItems: ComponentNodeType[] = [];
+      diff.forEach(item => {
+        const currentItem = value.find(d => d.id === item.id);
+        if (!currentItem) {
+          deleteItems.push(item);
+        } else {
+          if (!isEqual(item, currentItem)) {
+            updateItems.push(currentItem);
+          }
+          valueStatus[item.id] = true;
+        }
+      });
+      const newItems: ComponentNodeType[] = value.filter(d => !valueStatus[d.id]);
+      graph.removeCells(deleteItems.map(d => graph.getCellById(d.id)));
+      newItems.forEach(d => createComponentNode(graph, d));
+      updateItems.forEach(d => updateComponentNode(graph.getCellById(d.id) as Node, d));
+    } else {
+      graph.fromJSON(value);
+    }
     reloadDndAssets();
     reloadNodes();
   }
@@ -258,13 +269,14 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
     const store = new Store();
     storeRef.current = store;
     // 加载数据
-    getData({ roomId }).then(res => {
-      const graphData = foramtMapData(res.data, getRoomAssetsName(roomId));
+    cmdbBizRoomConfigurationFindGet({ roomId: `${roomId}` }).then(res => {
+      const graphData = foramtMapData(jsonToMapData(res.data), getRoomAssetsName(roomId));
       loadData(igraph, graphData);
       store.reset(graphData);
       updateHistoryData();
       setBackgroundNode(getBackgroundNode(igraph));
-      getAsset({ roomId }).then(res => {
+      setReadyRoomId(roomId);
+      cmdbBizRoomConfigurationGetWaitGet({ roomId: `${roomId}` }).then(res => {
         const loadedAssets: DndAssetType[] = graphData.filter(d => !!d.data.asset).map(d => ({ id: d.data.asset!.id, name: d.data.asset!.name, type: d.shape, used: true }));
         const waitAssets: DndAssetType[] = res.data.map(d => ({ id: `${d.id}_${d.type}`, name: d.name, type: d.icon, used: false }));
         setDndAssets([...loadedAssets, ...waitAssets]);
@@ -297,7 +309,7 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
         highlightCellViewRef.current = newHighlightCellView;
       }
     }
-  }, [highlightAsset, graph]);
+  }, [highlightAsset, graph, readyRoomId]);
 
   const saveToServer = () => {
     if (!graph) return;
@@ -305,7 +317,7 @@ const MapDesigner: React.FC<MapDesignerProps> = (props) => {
     const assetNodes = getAssetNodes(graph);
     onSave({
       roomId,
-      data: JSON.stringify(mapData),
+      data: mapDataToJson(mapData),
       assets: dndAssets.map(d => {
         if (d.used) {
           const assetNode = assetNodes.find(item => item.getData().asset.id === d.id)!;

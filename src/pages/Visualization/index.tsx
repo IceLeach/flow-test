@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Spin } from 'antd';
 import Icon from '@/components/Icon';
 import SearchTree from '@/components/SearchTree';
+import { cmdbBizRackEquTreeGet } from '@/services';
+import { CmdbBizRackEquTreeGetResData } from '@/types';
 import { equIconList } from '../asset/Classification/config';
 import MapContainer from './MapContainer';
 import styles from './index.less';
@@ -24,44 +26,17 @@ type TreeRoomType = {
   children?: TreeAssetType[];
 }
 
-const getTree = async () => ({
-  data: [
-    {
-      id: 1,
-      name: '机房1',
-      type: '1',
-      children: [
-        { id: 1, name: 'A011', type: '2', icon: 'STORE' },
-        { id: 2, name: 'A022', type: '2', icon: 'NET' },
-      ],
-    },
-    {
-      id: 2,
-      name: '机房2',
-      type: '1',
-      children: [
-        { id: 22, name: 'A222', type: '2', icon: 'STORE' },
-      ],
-    },
-    {
-      id: 3,
-      name: '库房',
-      type: '2',
-    },
-  ],
-})
-
-const formatTreeData = (data: any[]): TreeRoomType[] => {
+const formatTreeData = (data: CmdbBizRackEquTreeGetResData): TreeRoomType[] => {
   return data.map(d => ({
     type: d.type === '1' ? 'room' : 'store',
-    key: d.id,
+    key: Number(d.id),
     title: d.name,
     name: d.name,
     icon: <Icon type="icon-jifang" />,
     children: d.children?.map((item: any) => ({
       type: 'asset',
       key: `${item.id}_${item.type}`,
-      parentKey: d.id,
+      parentKey: Number(d.id),
       title: item.name,
       name: item.name,
       icon: equIconList.find((d) => d.type === item.icon)?.icon,
@@ -106,7 +81,7 @@ const Visualization: React.FC = () => {
 
   useEffect(() => {
     setStatus('loading');
-    getTree().then(res => {
+    cmdbBizRackEquTreeGet().then(res => {
       const tree = formatTreeData(res.data);
       setTreeData(tree);
       if (tree?.length) {

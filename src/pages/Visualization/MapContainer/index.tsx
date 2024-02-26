@@ -2,31 +2,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Spin } from 'antd';
 import MapViewer from '@/components/configurationMap/MapViewer';
 import { PlanModeItemStatus } from '@/components/configurationMap/MapViewer/types';
+import { cmdbBizScreenRackRateGet } from '@/services';
 import { createPopover, removePopover } from './Popover';
 import styles from './index.less';
 
 interface MapContainerProps {
   roomId: number;
   jumpToEquip: (key: string, callBack?: () => void) => void;
-}
-
-let c: boolean = false;
-const cmdbBizScreenRackRateGet = async (data: { roomId: number }) => {
-  c = !c;
-  return {
-    roomId: data.roomId,
-    data: {
-      rackList: c ? [
-        { id: 1, maxRate: 10 },
-        { id: 2, maxRate: 30 },
-        { id: 3, maxRate: 50 },
-      ] : [
-        { id: 1, maxRate: 50 },
-        { id: 2, maxRate: 70 },
-        { id: 3, maxRate: 90 },
-      ],
-    },
-  }
 }
 
 const MapContainer: React.FC<MapContainerProps> = (props) => {
@@ -58,7 +40,7 @@ const MapContainer: React.FC<MapContainerProps> = (props) => {
           return 'LL';
         }
       };
-      cmdbBizScreenRackRateGet({ roomId }).then((itemRes) => {
+      cmdbBizScreenRackRateGet({ roomId: `${roomId}` }).then((itemRes) => {
         // console.log('res', itemRes)
         const rackList = itemRes.data.rackList ?? [];
         mapItemsRef.current = rackList;

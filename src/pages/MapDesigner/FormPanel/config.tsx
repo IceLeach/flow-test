@@ -127,7 +127,7 @@ export const nodeFormItemLab: Record<NodeFormItemLabKey, (options: NodeFormItemO
               update(() => {
                 node.setSize({ width: size.height, height: size.width });
                 setCellConfig(node, { ...config, direction: value });
-              });
+              }, { change: [node] });
             } else {
               update(() => {
                 setCellConfig(node, { ...config, direction: value });

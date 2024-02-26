@@ -29,6 +29,7 @@ import FRESHAIR from './components/assets/FRESHAIR';
 import SD from './components/assets/SD';
 import TAHS from './components/assets/TAHS';
 import CAMERA from './components/assets/CAMERA';
+import EnvHeatmap from './components/env/EnvHeatmap';
 import { backgroundNodeShape } from './config';
 import { ComponentConfigType } from './types';
 
@@ -54,6 +55,11 @@ export const registerNodeMap: Record<string, RegisterNodeType> = {
   [backgroundNodeShape]: {
     component: Background,
     zIndex: 0,
+    readonly: true,
+  },
+  heatmap: {
+    component: EnvHeatmap,
+    zIndex: 9999,
     readonly: true,
   },
   door: {

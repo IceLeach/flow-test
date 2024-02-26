@@ -1963,6 +1963,11 @@
   resolved "https://registry.npmmirror.com/@types/d3-timer/-/d3-timer-2.0.3.tgz#d74350a9eb5991f054b2cf8e92efaf22be3e1a25"
   integrity sha512-jhAJzaanK5LqyLQ50jJNIrB8fjL9gwWZTgYjevPvkDLMU+kTAZkYsobI59nYoeSrH1PucuyJEi247Pb90t6XUg==
 
+"@types/geojson@*":
+  version "7946.0.14"
+  resolved "https://registry.npmmirror.com/@types/geojson/-/geojson-7946.0.14.tgz#319b63ad6df705ee2a65a73ef042c8271e696613"
+  integrity sha512-WCfD5Ht3ZesJUsONdhvm84dmzWOiOzOAqOncN0++w0lBw1o8OuDNJF2McvvCef/yBqb/HYRahp1BYtODFQ8bRg==
+
 "@types/graceful-fs@^4.1.3":
   version "4.1.9"
   resolved "https://registry.npmmirror.com/@types/graceful-fs/-/graceful-fs-4.1.9.tgz#2a06bc0f68a20ab37b3e36aa238be6abdf49e8b4"
@@ -1974,6 +1979,13 @@
   version "17.1.9"
   resolved "https://registry.npmmirror.com/@types/hapi__joi/-/hapi__joi-17.1.9.tgz#fb4001df38aba1cd2406ce4b17d4e6fc3b0bd036"
   integrity sha512-oOMFT8vmCTFncsF1engrs04jatz8/Anwx3De9uxnOK4chgSEgWBvFtpSoJo8u3784JNO+ql5tzRR6phHoRnscQ==
+
+"@types/heatmap.js@^2.0.41":
+  version "2.0.41"
+  resolved "https://registry.npmmirror.com/@types/heatmap.js/-/heatmap.js-2.0.41.tgz#0489f07b054e624afc09917435371fb63250f961"
+  integrity sha512-3oHffxC+N+1EKXjeC65klk1kHnLJ5i6tEKFNb/04J+qSfQuCliacsNBWDpt59JfG2vBXRRn+ICbzRZj48j6HfQ==
+  dependencies:
+    "@types/leaflet" "^0"
 
 "@types/hoist-non-react-statics@^3.3.1":
   version "3.3.5"
@@ -2016,6 +2028,13 @@
   version "7.0.15"
   resolved "https://registry.npmmirror.com/@types/json-schema/-/json-schema-7.0.15.tgz#596a1747233694d50f6ad8a7869fcb6f56cf5841"
   integrity sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==
+
+"@types/leaflet@^0":
+  version "0.7.40"
+  resolved "https://registry.npmmirror.com/@types/leaflet/-/leaflet-0.7.40.tgz#ed2436ef2772827c8d33c35640df74bb6f0a9b6d"
+  integrity sha512-R2UwXOKwnKZi9zNm37WbPTAVuqHmysE6NVihkc5DUrovTirUxFSbZzvXrlwv0n5sibe0w8VF1bWu0ta4kZlAaA==
+  dependencies:
+    "@types/geojson" "*"
 
 "@types/lodash@^4.14.202":
   version "4.14.202"
@@ -5183,6 +5202,11 @@ he@^1.2.0:
   version "1.2.0"
   resolved "https://registry.npmmirror.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
+
+heatmap.js@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.npmmirror.com/heatmap.js/-/heatmap.js-2.0.5.tgz#466d3b86513f5d49112a49d25700ab2730149153"
+  integrity sha512-CG2gYFP5Cv9IQCXEg3ZRxnJDyAilhWnQlAuHYGuWVzv6mFtQelS1bR9iN80IyDmFECbFPbg6I0LR5uAFHgCthw==
 
 highcharts@^11.3.0:
   version "11.3.0"
